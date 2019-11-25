@@ -2568,6 +2568,10 @@ void rd_kafka_cgrp_handle_heartbeat_error (rd_kafka_cgrp_t *rkcg,
                 reason = "group is rebalancing";
                 break;
 
+        case RD_KAFKA_RESP_ERR_FENCED_INSTANCE_ID:
+                reason = "consumer fenced by newer instance: rebalancing";
+                break;
+
         default:
                 reason = rd_kafka_err2str(err);
                 break;

@@ -654,6 +654,9 @@ static const struct rd_kafka_err_desc rd_kafka_err_descs[] = {
                   "Preferred leader was not available"),
         _ERR_DESC(RD_KAFKA_RESP_ERR_GROUP_MAX_SIZE_REACHED,
                   "Consumer group has reached maximum size"),
+        _ERR_DESC(RD_KAFKA_RESP_ERR_FENCED_INSTANCE_ID,
+                  "Static consumer fenced by other consumer with same "
+                  "group.instance.id"),
 
 	_ERR_DESC(RD_KAFKA_RESP_ERR__END, NULL)
 };

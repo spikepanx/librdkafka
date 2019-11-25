@@ -550,6 +550,9 @@ typedef enum {
         RD_KAFKA_RESP_ERR_PREFERRED_LEADER_NOT_AVAILABLE = 80,
         /** Consumer group has reached maximum size */
         RD_KAFKA_RESP_ERR_GROUP_MAX_SIZE_REACHED = 81,
+        /** Static consumer fenced by other consumer with same
+         *  group.instance.id. */
+        RD_KAFKA_RESP_ERR_FENCED_INSTANCE_ID = 82,
 
         RD_KAFKA_RESP_ERR_END_ALL,
 } rd_kafka_resp_err_t;
