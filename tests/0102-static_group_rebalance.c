@@ -356,8 +356,9 @@ int main_0102_static_group_rebalance (int argc, char **argv) {
         /* Should take at least as long as `session.timeout.ms` but less than
          * `max.poll.interval.ms`, but since we can't really know when
          * the last Heartbeat or SyncGroup request was sent we need to
-         * allow some leeway (4s) on the minimum side. */
-        TIMING_ASSERT(&t_close, 6000-4000, 9000);
+         * allow some leeway on the minimum side (4s), and also some on
+         * the maximum side (1s) for slow runtimes. */
+        TIMING_ASSERT(&t_close, 6000-4000, 9000+1000);
 
         c[1].expected_rb_event = RD_KAFKA_RESP_ERR__REVOKE_PARTITIONS;
         test_consumer_close(c[1].rk);
