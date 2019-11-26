@@ -192,6 +192,7 @@ int main_0102_static_group_rebalance (int argc, char **argv) {
                 /* keep consumer 2 alive while consumer 1 awaits
                  * its assignment
                  */
+                c[1].curr_line = __LINE__;
                 test_consumer_poll_once(c[1].rk, &mv, 0);
         }
 
@@ -202,8 +203,10 @@ int main_0102_static_group_rebalance (int argc, char **argv) {
          * Consume all the messages so we can watch for duplicates
          * after rejoin/rebalance operations.
          */
+        c[0].curr_line = __LINE__;
         test_consumer_poll("serve.queue",
                            c[0].rk, testid, c[0].partition_cnt, 0, -1, &mv);
+        c[1].curr_line = __LINE__;
         test_consumer_poll("serve.queue",
                            c[1].rk, testid, c[1].partition_cnt, 0, -1, &mv);
 
@@ -227,8 +230,10 @@ int main_0102_static_group_rebalance (int argc, char **argv) {
         c[1].expected_rb_event = RD_KAFKA_RESP_ERR__ASSIGN_PARTITIONS;
         rebalance_start = test_clock();
         while (!static_member_wait_rebalance(&c[1], rebalance_start,
-                                             &c[1].assigned_at, 1000))
+                                             &c[1].assigned_at, 1000)) {
+                c[0].curr_line = __LINE__;
                 test_consumer_poll_once(c[0].rk, &mv, 0);
+        }
         TIMING_STOP(&t_close);
 
         /* Should complete before `session.timeout.ms` */
@@ -248,8 +253,10 @@ int main_0102_static_group_rebalance (int argc, char **argv) {
         c[0].expected_rb_event = RD_KAFKA_RESP_ERR__REVOKE_PARTITIONS;
         c[1].expected_rb_event = RD_KAFKA_RESP_ERR__REVOKE_PARTITIONS;
         while (!static_member_wait_rebalance(&c[0], rebalance_start,
-                                             &c[0].revoked_at, 1000))
+                                             &c[0].revoked_at, 1000)) {
+                c[1].curr_line = __LINE__;
                 test_consumer_poll_once(c[1].rk, &mv, 0);
+        }
 
         static_member_expect_rebalance(&c[1], rebalance_start,
                                        &c[1].revoked_at, -1);
@@ -258,15 +265,17 @@ int main_0102_static_group_rebalance (int argc, char **argv) {
         c[0].expected_rb_event = RD_KAFKA_RESP_ERR__ASSIGN_PARTITIONS;
         c[1].expected_rb_event = RD_KAFKA_RESP_ERR__ASSIGN_PARTITIONS;
         while (!static_member_wait_rebalance(&c[0], rebalance_start,
-                                             &c[0].assigned_at, 1000))
+                                             &c[0].assigned_at, 1000)) {
+                c[1].curr_line = __LINE__;
                 test_consumer_poll_once(c[1].rk, &mv, 0);
+        }
 
         static_member_expect_rebalance(&c[1], rebalance_start,
                                        &c[1].assigned_at, -1);
 
         TEST_SAY("== Testing consumer unsubscribe ==\n");
 
-        /* Unsubscribe should send a LeaveGroupRequest invoking a reblance */
+        /* Unsubscribe should send a LeaveGroupRequest invoking a rebalance */
 
         /* Send LeaveGroup incrementing generation by 1 */
         rebalance_start = test_clock();
@@ -298,8 +307,10 @@ int main_0102_static_group_rebalance (int argc, char **argv) {
         c[0].expected_rb_event = RD_KAFKA_RESP_ERR__ASSIGN_PARTITIONS;
         c[1].expected_rb_event = RD_KAFKA_RESP_ERR__ASSIGN_PARTITIONS;
         while (!static_member_wait_rebalance(&c[1], rebalance_start,
-                                             &c[1].assigned_at, 1000))
+                                             &c[1].assigned_at, 1000)) {
+                c[0].curr_line = __LINE__;
                 test_consumer_poll_once(c[0].rk, &mv, 0);
+        }
 
         static_member_expect_rebalance(&c[0], rebalance_start,
                                        &c[0].assigned_at, -1);
@@ -314,15 +325,19 @@ int main_0102_static_group_rebalance (int argc, char **argv) {
         rebalance_start = test_clock();
         c[1].expected_rb_event = RD_KAFKA_RESP_ERR__REVOKE_PARTITIONS;
         c[0].expected_rb_event = RD_KAFKA_RESP_ERR__REVOKE_PARTITIONS;
+        c[0].curr_line = __LINE__;
         test_consumer_poll_no_msgs("wait.max.poll", c[0].rk, testid,
                                    6000 + 9000);
+        c[1].curr_line = __LINE__;
         test_consumer_poll_expect_err(c[1].rk, testid, 1000,
                                       RD_KAFKA_RESP_ERR__MAX_POLL_EXCEEDED);
 
         /* Await revocation */
         while (!static_member_wait_rebalance(&c[0], rebalance_start,
-                                             &c[0].revoked_at, 1000))
+                                             &c[0].revoked_at, 1000)) {
+                c[1].curr_line = __LINE__;
                 test_consumer_poll_once(c[1].rk, &mv, 0);
+        }
 
         static_member_expect_rebalance(&c[1], rebalance_start,
                                        &c[1].revoked_at, -1);
@@ -331,8 +346,10 @@ int main_0102_static_group_rebalance (int argc, char **argv) {
         c[0].expected_rb_event = RD_KAFKA_RESP_ERR__ASSIGN_PARTITIONS;
         c[1].expected_rb_event = RD_KAFKA_RESP_ERR__ASSIGN_PARTITIONS;
         while (!static_member_wait_rebalance(&c[1], rebalance_start,
-                                             &c[1].assigned_at, 1000))
+                                             &c[1].assigned_at, 1000)) {
+                c[0].curr_line = __LINE__;
                 test_consumer_poll_once(c[0].rk, &mv, 0);
+        }
 
         static_member_expect_rebalance(&c[0], rebalance_start,
                                        &c[0].assigned_at, -1);
